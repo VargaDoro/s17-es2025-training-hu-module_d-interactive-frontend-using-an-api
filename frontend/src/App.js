@@ -8,8 +8,12 @@ import MentorsPage from "./pages/MentorsPage";
 import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import CourseDetailsPage from "./pages/CourseDetailsPage";
-
-export default function App() {
+import { AuthProvider } from "./contexts/AuthContext";
+import authMiddleware from "./middleware/autMiddleware";
+import { CoursesProvider } from "./contexts/CoursesContext";
+import { MentorProvider } from "./contexts/MentorContext";
+import BookedSessionPage from "./pages/BookedSessionPage";
+function App() {
   const router = createBrowserRouter([
     {
       path: "/login",
@@ -22,6 +26,7 @@ export default function App() {
     {
       path: "/",
       element: <Layout />,
+      middleware: [authMiddleware],
       children: [
         {
           index: true,
@@ -34,19 +39,27 @@ export default function App() {
         {
           path: "courses",
           children: [
-          {
-            index: true,
-            element: <CoursesPage />,
-          },
-          {
-            path: ":id",
-            element: <CourseDetailsPage />,
-          },
+            {
+              index: true,
+              element: <CoursesPage />,
+            },
+            {
+              path: ":id",
+              element: <CourseDetailsPage />,
+            },
           ],
+        },
+        {
+          path: "/courses/{id}",
+          element: <CourseDetailsPage />,
         },
         {
           path: "/mentors",
           element: <MentorsPage />,
+        },
+                {
+          path: "/bookedsession",
+          element: <BookedSessionPage />,
         },
       ],
     },
@@ -55,5 +68,16 @@ export default function App() {
       element: <NoPage />,
     },
   ]);
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <CoursesProvider>
+        
+         <MentorProvider>
+          <RouterProvider router={router} />;
+        </MentorProvider>
+      </CoursesProvider>
+    </AuthProvider>
+  );
 }
+
+export default App;
